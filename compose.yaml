@@ -9,7 +9,6 @@ volumes:
 
 x-agent-env: &x-agent-env
   FIRECRAWL_API_URL: ${FIRECRAWL_API_URL}
-  WIKI_PATH:
 
 
 services:

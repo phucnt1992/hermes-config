@@ -1,0 +1,12 @@
+FROM nousresearch/hermes-agent:main
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update; apt full-upgrade -y; \
+    # Install headless browser dependencies for Playwright
+    curl -fsSL https://deb.nodesource.com/setup_24.x | bash - ; \
+    apt install -y chromium nodejs; \
+    npm install -g npm; \
+    apt autoremove -y; apt autoclean -y; rm -rf /var/lib/apt/lists/*; \
+    # Install ddgs for DuckDuckGo search capability
+    cd /opt/hermes; uv pip install ddgs;

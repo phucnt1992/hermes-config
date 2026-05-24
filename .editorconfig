@@ -1,0 +1,24 @@
+# EditorConfig configuration file
+root = true
+
+# All files
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# tmpl files
+[*.tmpl]
+indent_size = 2
+
+# JSON files
+[*.json]
+indent_size = 2
+
+# YAML files
+[*.{yaml,yml}]
+indent_size = 2
+

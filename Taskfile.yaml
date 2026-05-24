@@ -1,0 +1,26 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Default task
+    cmd: task --list-all
+
+  build:
+    desc: Build the Hermes Agent Docker images
+    cmds:
+      - docker compose -f compose.yaml -f compose.fireclaw.yaml build --no-cache {{.CLI_ARGS}}
+
+  start:
+    desc: Start the Hermes Agent using Docker Compose
+    cmds:
+      - docker compose -f compose.yaml -f compose.fireclaw.yaml up -d {{.CLI_ARGS}}
+
+  stop:
+    desc: Stop the Hermes Agent and remove containers
+    cmds:
+      - docker compose -f compose.yaml -f compose.fireclaw.yaml down
+
+  clean:
+    desc: Remove all Hermes-related Docker containers, volumes, and networks
+    cmds:
+      - docker compose -f compose.yaml -f compose.fireclaw.yaml down -v --rmi all --remove-orphans

@@ -1,0 +1,100 @@
+name: hermes-stack
+
+networks:
+  hermes-net:
+    driver: bridge
+
+volumes:
+  hermes-agent:
+
+x-agent-env: &x-agent-env
+  FIRECRAWL_API_URL: ${FIRECRAWL_API_URL}
+
+
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: hermes-agent
+    restart: unless-stopped
+    command: gateway run
+    ports:
+      - 8642:8642
+    volumes:
+      - ${HERMES_HOME:-${HOME}/.hermes}:/opt/data
+      - ${HERMES_WORKSPACE:-${HOME}/workspace}:/workspace
+      - hermes-agent:/opt/hermes
+    environment:
+      # Align UID/GID across containers sharing the hermes-home volume.
+      # Defaults to 1000 to match WANTED_UID/WANTED_GID in the webui service.
+      - HERMES_UID=${UID:-1000}
+      - HERMES_GID=${GID:-1000}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - hermes-net
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+  dashboard:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes-dashboard
+    command: dashboard --host 0.0.0.0 --insecure
+    ports:
+      - "9119:9119"
+    volumes:
+      - ${HERMES_HOME:-${HOME}/.hermes}:/opt/data
+    environment:
+      # Align UID/GID across containers sharing the hermes-home volume.
+      # Defaults to 1000 to match WANTED_UID/WANTED_GID in the webui service.
+      - HERMES_UID=${UID:-1000}
+      - HERMES_GID=${GID:-1000}
+      # Dashboard connects to the gateway for health/session data
+      - GATEWAY_HEALTH_URL=http://hermes-agent:8642
+    depends_on:
+      - agent
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+    networks:
+      - hermes-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  webui:
+    build:
+      context: .
+      dockerfile: Dockerfile.webui
+    container_name: hermes-webui
+    depends_on:
+      - agent
+    ports:
+      - "8787:8787"
+    volumes:
+      - ${HERMES_HOME:-${HOME}/.hermes}:/home/hermeswebui/.hermes
+      - ${HERMES_WORKSPACE:-${HOME}/workspace}:/workspace
+      - hermes-agent:/home/hermeswebui/.hermes/hermes-agent:ro
+    environment:
+      <<: *x-agent-env
+      # Ref: https://github.com/nesquena/hermes-webui/issues/2664
+      PYTHONPATH: /home/hermeswebui/.hermes/hermes-agent
+      HERMES_WEBUI_STATE_DIR: /home/hermeswebui/.hermes/webui
+      HERMES_WEBUI_AGENT_DIR: /home/hermeswebui/.hermes/hermes-agent
+      HERMES_CONFIG_PATH: /home/hermeswebui/.hermes/config.yaml
+      HERMES_HOME: /home/hermeswebui/.hermes
+      HERMES_WEBUI_AUTO_INSTALL: 1
+      WANTED_UID: ${UID:-1000}
+      WANTED_GID: ${GID:-1000}
+      HERMES_WEBUI_HOST: 0.0.0.0
+      HERMES_WEBUI_PORT: 8787
+    restart: unless-stopped
+    networks:
+      - hermes-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+

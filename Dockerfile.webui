@@ -2,9 +2,9 @@ FROM ghcr.io/nesquena/hermes-webui:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update ; apt full-upgrade -y; \
-    curl -fsSL https://deb.nodesource.com/setup_24.x | bash - ; \
+RUN apt update; apt full-upgrade -y; \
     # Install headless browser dependencies for Playwright
+    curl -fsSL https://deb.nodesource.com/setup_24.x | bash - ; \
     apt install -y chromium nodejs; \
     npm install -g npm; \
     apt autoremove -y; apt autoclean -y; rm -rf /var/lib/apt/lists/*;

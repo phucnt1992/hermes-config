@@ -10,13 +10,15 @@ volumes:
 x-agent-env: &x-agent-env
   FIRECRAWL_API_URL: ${FIRECRAWL_API_URL}
 
-
 services:
   agent:
     build:
       context: .
       dockerfile: Dockerfile.agent
     container_name: hermes-agent
+    profiles:
+      - full
+      - lite
     restart: unless-stopped
     command: gateway run
     ports:
@@ -40,6 +42,8 @@ services:
           cpus: "2.0"
           memory: 4G
   dashboard:
+    profiles:
+      - full
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
     command: dashboard --host 0.0.0.0 --insecure
@@ -71,6 +75,9 @@ services:
       context: .
       dockerfile: Dockerfile.webui
     container_name: hermes-webui
+    profiles:
+      - lite
+      - full
     depends_on:
       - agent
     ports:
@@ -81,8 +88,6 @@ services:
       - hermes-agent:/home/hermeswebui/.hermes/hermes-agent:ro
     environment:
       <<: *x-agent-env
-      # Ref: https://github.com/nesquena/hermes-webui/issues/2664
-      PYTHONPATH: /home/hermeswebui/.hermes/hermes-agent
       HERMES_WEBUI_STATE_DIR: /home/hermeswebui/.hermes/webui
       HERMES_WEBUI_AGENT_DIR: /home/hermeswebui/.hermes/hermes-agent
       HERMES_CONFIG_PATH: /home/hermeswebui/.hermes/config.yaml

@@ -95,6 +95,7 @@ services:
       HERMES_CONFIG_PATH: /home/hermeswebui/.hermes/config.yaml
       HERMES_HOME: /home/hermeswebui/.hermes
       HERMES_WEBUI_AUTO_INSTALL: 1
+      HERMES_WEBUI_DEFAULT_WORKSPACE: /workspace
       WIKI_PATH: /workspace/wiki
       WANTED_UID: ${UID:-1000}
       WANTED_GID: ${GID:-1000}

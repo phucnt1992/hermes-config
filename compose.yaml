@@ -16,6 +16,7 @@ services:
       context: .
       dockerfile: Dockerfile.agent
     container_name: hermes-agent
+    user: "${UID:-1000}:${GID:-1000}"
     profiles:
       - full
       - lite
@@ -75,6 +76,7 @@ services:
       context: .
       dockerfile: Dockerfile.webui
     container_name: hermes-webui
+    user: "${UID:-1000}:${GID:-1000}"
     profiles:
       - lite
       - full
@@ -103,4 +105,3 @@ services:
       - hermes-net
     extra_hosts:
       - "host.docker.internal:host-gateway"
-

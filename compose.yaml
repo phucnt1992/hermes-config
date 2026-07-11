@@ -32,6 +32,7 @@ services:
       # Defaults to 1000 to match WANTED_UID/WANTED_GID in the webui service.
       - HERMES_UID=${UID:-1000}
       - HERMES_GID=${GID:-1000}
+      - HERMES_WRITE_SAFE_ROOT=/workspace
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -94,6 +95,7 @@ services:
       HERMES_HOME: /home/hermeswebui/.hermes
       HERMES_WEBUI_AUTO_INSTALL: 1
       HERMES_WEBUI_DEFAULT_WORKSPACE: /workspace
+      HERMES_WRITE_SAFE_ROOT: /workspace
       WIKI_PATH: /workspace/wiki
       WANTED_UID: ${UID:-1000}
       WANTED_GID: ${GID:-1000}
